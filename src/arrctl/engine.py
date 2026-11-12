@@ -460,7 +460,7 @@ class Engine:
         if not isinstance(fields, list):
             return {}
         return {
-            entry.get("name"): entry.get("value")
+            str(entry["name"]): entry.get("value")
             for entry in fields
             if isinstance(entry, dict) and entry.get("name")
         }

@@ -18,6 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --extra dev
       - run: uv run ruff check .
+      - run: uv run mypy src/arrctl
       - run: uv run pytest -q
 
   package:

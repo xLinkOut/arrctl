@@ -153,7 +153,9 @@ class Puller:
         elif name == "tag":
             cleaned = {"label": item.get("label")}
         elif name == "qualitydefinition":
-            quality = item.get("quality") if isinstance(item.get("quality"), dict) else {}
+            quality: dict[str, Any] = (
+                item["quality"] if isinstance(item.get("quality"), dict) else {}
+            )
             cleaned = {
                 "quality": {"name": quality.get("name")},
                 "minSize": item.get("minSize"),
@@ -258,13 +260,13 @@ class Puller:
     @staticmethod
     def _map(value: Any) -> Any:
         if isinstance(value, dict):
-            result = CommentedMap()
+            mapping = CommentedMap()
             for key, item in value.items():
-                result[key] = Puller._map(item)
-            return result
+                mapping[key] = Puller._map(item)
+            return mapping
         if isinstance(value, list):
-            result = CommentedSeq()
+            sequence = CommentedSeq()
             for item in value:
-                result.append(Puller._map(item))
-            return result
+                sequence.append(Puller._map(item))
+            return sequence
         return copy.deepcopy(value)

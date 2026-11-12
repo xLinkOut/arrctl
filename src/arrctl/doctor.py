@@ -20,16 +20,16 @@ def run_doctor(document: Document) -> tuple[list[str], list[str]]:
             problems.append(str(exc))
             continue
         if app == "bazarr":
-            client = BazarrClient(connection)
+            bazarr_client = BazarrClient(connection)
             try:
-                status = client.get("/api/system/status")
+                status = bazarr_client.get("api/system/status")
                 version = (
                     status.get("bazarr_version", "unknown")
                     if isinstance(status, dict)
                     else "unknown"
                 )
                 messages.append(f"{app}: connected, version {version}")
-                live = client.settings()
+                live = bazarr_client.settings()
                 allowed = set(app_schema("bazarr")["config"]["settings"])
                 normalised = {item.split(".", 1)[0] for item in allowed}
                 for section in live:
@@ -42,18 +42,18 @@ def run_doctor(document: Document) -> tuple[list[str], list[str]]:
             except ArrctlError as exc:
                 problems.append(str(exc))
             finally:
-                client.close()
+                bazarr_client.close()
             continue
 
         api_version = str(app_schema(app)["api_version"])
-        client = ServarrClient(app, connection, api_version)
+        servarr_client = ServarrClient(app, connection, api_version)
         try:
-            status = client.status()
+            status = servarr_client.status()
             version = status.get("version", "unknown")
             messages.append(f"{app}: connected, version {version}")
             for resource in app_schema(app)["config"]:
                 try:
-                    live = client.get(f"config/{resource}")
+                    live = servarr_client.get(f"config/{resource}")
                 except ApiError as exc:
                     if exc.status_code == 404:
                         continue
@@ -73,7 +73,7 @@ def run_doctor(document: Document) -> tuple[list[str], list[str]]:
                     )
             for name, definition in _resource_defs(app):
                 try:
-                    items = client.get(definition.path)
+                    items = servarr_client.get(definition.path)
                 except ApiError as exc:
                     if exc.status_code == 404:
                         continue
@@ -85,7 +85,7 @@ def run_doctor(document: Document) -> tuple[list[str], list[str]]:
         except ArrctlError as exc:
             problems.append(str(exc))
         finally:
-            client.close()
+            servarr_client.close()
     return messages, problems
 
 

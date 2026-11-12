@@ -144,7 +144,6 @@ class Document:
             raise ConfigError("no output path set")
         yaml = YAML()
         yaml.default_flow_style = False
-        yaml.sort_keys = False
         yaml.allow_unicode = True
         yaml.width = 4096
         target.parent.mkdir(parents=True, exist_ok=True)
