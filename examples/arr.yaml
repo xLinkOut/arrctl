@@ -1,0 +1,192 @@
+version: 1
+
+# Values here are merged into every app that supports the resource.
+# App-specific config overrides these defaults.
+defaults:
+  host:
+    logLevel: info
+    updateMechanism: docker
+    backupInterval: 7
+    backupRetention: 28
+    analyticsEnabled: false
+  ui:
+    firstDayOfWeek: 1          # 0 = Sunday, 1 = Monday
+    theme: auto
+    showRelativeDates: true
+    uiLanguage: 1
+  mediamanagement:
+    copyUsingHardlinks: true
+    setPermissionsLinux: true
+    chmodFolder: "775"
+    chownGroup: media
+    importExtraFiles: true
+    extraFileExtensions: srt
+  indexer:
+    minimumAge: 0
+    retention: 0
+    maximumSize: 0
+    rssSyncInterval: 15
+
+apps:
+  sonarr:
+    connection:
+      url: http://127.0.0.1:8010
+      api_key: ${SONARR_API_KEY}
+      # api_key_file: /srv/jupiter/sonarr/config.xml
+    config:
+      mediamanagement:
+        autoUnmonitorPreviouslyDownloadedEpisodes: false
+        createEmptySeriesFolders: false
+      naming:
+        renameEpisodes: true
+        replaceIllegalCharacters: true
+        colonReplacementFormat: 4
+        standardEpisodeFormat: "{Series Title} - S{season:00}E{episode:00} - {Episode Title} [{Quality Full}]"
+        seriesFolderFormat: "{Series Title} ({Series Year})"
+        seasonFolderFormat: "Season {season:00}"
+    resources:
+      tag:
+        - label: arrctl
+      rootfolder:
+        - path: /data/library/serie
+      downloadclient:
+        - name: qBittorrent
+          implementation: QBittorrent
+          configContract: QBittorrentSettings
+          enable: true
+          protocol: torrent
+          priority: 1
+          fields:
+            host: gluetun
+            port: 8080
+            username: admin
+            password: ${QBITTORRENT_PASSWORD}
+            category: serie
+      notification:
+        - name: ntfy
+          implementation: Ntfy
+          configContract: NtfySettings
+          onGrab: false
+          onDownload: true
+          onUpgrade: true
+          onHealthIssue: true
+          fields:
+            serverUrl: http://ntfy:2586
+            topic: alerts
+            priority: default
+            tags: arrctl
+
+  radarr:
+    connection:
+      url: http://127.0.0.1:8008
+      api_key: ${RADARR_API_KEY}
+    config:
+      naming:
+        renameMovies: true
+        replaceIllegalCharacters: true
+        colonReplacementFormat: spaceDashSpace
+        standardMovieFormat: "{Movie CleanTitle} ({Release Year}) [{Quality Full}]"
+        movieFolderFormat: "{Movie CleanTitle} ({Release Year})"
+    resources:
+      rootfolder:
+        - path: /data/library/film
+      downloadclient:
+        - name: qBittorrent
+          implementation: QBittorrent
+          configContract: QBittorrentSettings
+          enable: true
+          protocol: torrent
+          priority: 1
+          fields:
+            host: gluetun
+            port: 8080
+            username: admin
+            password: ${QBITTORRENT_PASSWORD}
+            category: film
+
+  lidarr:
+    connection:
+      url: http://127.0.0.1:8016
+      api_key: ${LIDARR_API_KEY}
+    config:
+      naming:
+        renameTracks: true
+        replaceIllegalCharacters: true
+        colonReplacementFormat: 4
+        standardTrackFormat: "{Artist Name}/{Album Title}/{Track Number} - {Track Title}"
+        artistFolderFormat: "{Artist Name}"
+    resources:
+      rootfolder:
+        - path: /data/library/musica
+
+  whisparr:
+    connection:
+      url: http://127.0.0.1:8015
+      api_key: ${WHISPARR_API_KEY}
+    config:
+      naming:
+        renameMovies: true
+        renameScenes: true
+        replaceIllegalCharacters: true
+        colonReplacementFormat: spaceDashSpace
+    resources:
+      rootfolder:
+        - path: /data/adulti
+
+  prowlarr:
+    connection:
+      url: http://127.0.0.1:8007
+      api_key: ${PROWLARR_API_KEY}
+    config:
+      ui:
+        firstDayOfWeek: 1
+      development:
+        logIndexerResponse: false
+    resources:
+      application:
+        - name: Sonarr
+          implementation: Sonarr
+          configContract: SonarrSettings
+          syncLevel: fullSync
+          fields:
+            prowlarrUrl: http://gluetun:9696
+            baseUrl: http://172.30.0.11:8989
+            apiKey: ${SONARR_API_KEY}
+        - name: Radarr
+          implementation: Radarr
+          configContract: RadarrSettings
+          syncLevel: fullSync
+          fields:
+            prowlarrUrl: http://gluetun:9696
+            baseUrl: http://172.30.0.10:7878
+            apiKey: ${RADARR_API_KEY}
+      indexerproxy:
+        - name: FlareSolverr
+          implementation: FlareSolverr
+          configContract: FlareSolverrSettings
+          fields:
+            host: http://127.0.0.1:8191
+
+  bazarr:
+    connection:
+      url: http://127.0.0.1:8011
+      api_key: ${BAZARR_API_KEY}
+    config:
+      general:
+        theme: auto
+        page_size: 50
+        use_sonarr: true
+        use_radarr: true
+        use_jellyfin: true
+      sonarr:
+        ip: sonarr
+        port: 8989
+        apikey: ${SONARR_API_KEY}
+        base_url: /
+        ssl: false
+      radarr:
+        ip: radarr
+        port: 7878
+        apikey: ${RADARR_API_KEY}
+        base_url: /
+        ssl: false
