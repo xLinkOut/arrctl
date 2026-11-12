@@ -350,8 +350,9 @@ class Engine:
         payload.pop("id", None)
         if isinstance(payload.get("fields"), dict):
             payload["fields"] = self._build_fields(client, definition, payload, current=None)
-        for key in READ_ONLY_FIELDS:
-            payload.pop(key, None)
+        for key in list(payload):
+            if key in READ_ONLY_FIELDS or key.startswith("supportsOn"):
+                payload.pop(key, None)
         if definition.prepare == "quality_definition":
             raise ConfigError("qualitydefinition cannot be created")
         return client.post(definition.path, payload)

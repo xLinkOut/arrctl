@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7
+
+- Strip read-only `supportsOn*` flags from pulled notifications and creates.
+
 ## 0.1.6
 
 - Resolve `${ENV}` placeholders inside config values and resource `fields`.

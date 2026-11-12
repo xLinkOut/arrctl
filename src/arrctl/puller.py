@@ -142,7 +142,7 @@ class Puller:
     def _clean_resource(self, name: str, item: dict[str, Any]) -> dict[str, Any]:
         cleaned: dict[str, Any] = {}
         for key, value in item.items():
-            if key in PULL_EXCLUDE:
+            if key in PULL_EXCLUDE or key.startswith("supportsOn"):
                 continue
             if key == "fields" and isinstance(value, list):
                 cleaned["fields"] = self._clean_fields(value)
