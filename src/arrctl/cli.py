@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -286,9 +287,6 @@ def init(
             default_url = urls[app_name]
             url = typer.prompt("  URL", default=default_url)
             env_name = f"{app_name.upper()}_API_KEY"
-            default_key = ""
-            import os
-
             default_key = os.environ.get(env_name, "")
             api_key = typer.prompt(
                 f"  API key ({env_name})",
@@ -305,6 +303,11 @@ def init(
             raise typer.Exit(1) from exc
         for warning in warnings:
             err_console.print(f"[yellow]warning:[/yellow] {warning}")
+        # Never persist the API keys entered for the initial pull.
+        for app_name in selected:
+            document.raw["apps"][app_name]["connection"]["api_key"] = (
+                "${" + app_name.upper() + "_API_KEY}"
+            )
     document.save(output)
     console.print(f"[green]Wrote[/green] {output}")
 
