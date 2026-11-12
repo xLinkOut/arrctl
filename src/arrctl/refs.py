@@ -52,7 +52,11 @@ def resolve_refs_out(
 
 
 def resolve_refs_in(
-    client: Any, item: dict[str, Any], cache: dict[str, list[Any]]
+    client: Any,
+    item: dict[str, Any],
+    cache: dict[str, list[Any]],
+    *,
+    strict: bool = True,
 ) -> dict[str, Any]:
     """Turn names/labels into live IDs before creating or updating."""
     result = copy.deepcopy(item)
@@ -66,7 +70,9 @@ def resolve_refs_in(
             if isinstance(candidate, dict) and candidate.get(label) == value
         ]
         if not matches:
-            raise ConfigError(f"{field}: {label} {value!r} not found on this instance")
+            if strict:
+                raise ConfigError(f"{field}: {label} {value!r} not found on this instance")
+            continue
         result[field] = matches[0].get("id")
     tags = result.get(TAG_FIELD)
     if isinstance(tags, list) and any(isinstance(tag, str) for tag in tags):
@@ -79,7 +85,10 @@ def resolve_refs_in(
         for tag in tags:
             if isinstance(tag, str):
                 if tag not in by_label:
-                    raise ConfigError(f"tags: label {tag!r} not found on this instance")
+                    if strict:
+                        raise ConfigError(f"tags: label {tag!r} not found on this instance")
+                    resolved.append(tag)
+                    continue
                 resolved.append(by_label[tag])
             else:
                 resolved.append(tag)

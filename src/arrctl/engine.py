@@ -224,7 +224,9 @@ class Engine:
             for desired in items:
                 if not isinstance(desired, dict):
                     raise ConfigError(f"apps.{app}.resources.{name} entries must be mappings")
-                desired = resolve_refs_in(client, desired, self._ref_cache)
+                desired = resolve_refs_in(
+                    client, desired, self._ref_cache, strict=apply
+                )
                 ident = identity_label(identity_value(desired, definition.identity))
                 current = current_by_identity.get(identity_value(desired, definition.identity))
                 if current is None:
@@ -235,7 +237,10 @@ class Engine:
                         )
                     if apply:
                         created = self._create_resource(client, definition, desired)
-                        current_by_identity[identity_value(created, definition.identity)] = created
+                        if isinstance(created, dict):
+                            current_by_identity[
+                                identity_value(created, definition.identity)
+                            ] = created
                         self._ref_cache.clear()
                     result.changes.append(
                         Change(

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from arrctl.config import Document
@@ -82,6 +81,4 @@ apps:
     assert doc.connection("sonarr").api_key == "abc123"
 
 
-def test_environment_placeholder(monkeypatch) -> None:
-    monkeypatch.setenv("SONARR_API_KEY", "from-env")
-    os.environ.setdefault("UNUSED", "x")
+

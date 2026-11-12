@@ -107,8 +107,8 @@ class ServarrClient(BaseClient):
 
     def api(self, path: str) -> str:
         if path.startswith("/"):
-            return path
-        return f"/api/{self.api_version}/{path.lstrip('/')}"
+            path = path.lstrip("/")
+        return f"api/{self.api_version}/{path.lstrip('/')}"
 
     def get(self, path: str, *, params: dict[str, Any] | None = None) -> Any:
         return super().get(self.api(path), params=params)
@@ -127,7 +127,7 @@ class ServarrClient(BaseClient):
         last_error: Exception | None = None
         while time.monotonic() < deadline:
             try:
-                super().get("/ping")
+                super().get("ping")
                 return
             except (ApiError, ConnectionError) as exc:
                 last_error = exc
@@ -147,7 +147,7 @@ class BazarrClient(BaseClient):
         last_error: Exception | None = None
         while time.monotonic() < deadline:
             try:
-                self.get("/api/system/ping")
+                self.get("api/system/ping")
                 return
             except (ApiError, ConnectionError) as exc:
                 last_error = exc
@@ -155,11 +155,11 @@ class BazarrClient(BaseClient):
         raise ConnectionError(f"bazarr: not ready after {timeout:.0f}s: {last_error}")
 
     def settings(self) -> dict[str, Any]:
-        data = self.get("/api/system/settings")
+        data = self.get("api/system/settings")
         return data if isinstance(data, dict) else {}
 
     def save_settings(self, items: list[tuple[str, str]]) -> None:
         data: dict[str, list[str]] = {}
         for key, value in items:
             data.setdefault(key, []).append(value)
-        self._request("POST", "/api/system/settings", data=data)
+        self._request("POST", "api/system/settings", data=data)

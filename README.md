@@ -293,7 +293,7 @@ A one-shot service is enough:
 ```yaml
 services:
   arrctl:
-    image: ghcr.io/xlinkout/arrctl:0.1.0
+    image: ghcr.io/xlinkout/arrctl:0.1.1
     profiles: ["setup"]
     networks: [media]
     depends_on:
@@ -338,7 +338,7 @@ For a truly fresh instance, either inject the API keys before first boot with th
 
 - `arrctl` manages settings and configuration resources, not the media library.
 - No automatic deletion/pruning. Removing an item from YAML does not delete it from the app.
-- Some reference fields (`qualityProfileId`, `tags`, etc.) use the app's native IDs. They are stable for the same instance but may need adjustment when recreating a stack.
+- `arrctl` resolves the common references by name: `qualityProfileId`, `metadataProfileId`, `languageProfileId`, `downloadClientId`, `appProfileId`, `indexerId` and `tags`. `pull` writes names/labels; `apply` turns them back into the IDs of the target instance. Other IDs remain native.
 - Bazarr settings use the hidden `/api/system/settings` endpoint. It works on 1.6.x but is not part of Bazarr's documented public API.
 - Quality definitions are predefined; `arrctl` can update them but not create them.
 - Host/network changes may require a restart; use `--restart` or restart the container.
