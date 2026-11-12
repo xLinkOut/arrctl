@@ -144,7 +144,8 @@ apps:
     )
     doc = Document.load(path)
     Puller(doc, only="sonarr.ui")._infer_defaults()
-    assert next(iter(doc.raw)) == "defaults"
+    assert next(iter(doc.raw)) == "version"
+    assert list(doc.raw)[1] == "defaults"
     assert doc.raw["defaults"]["ui"]["firstDayOfWeek"] == 1
     assert "firstDayOfWeek" not in doc.raw["apps"]["sonarr"]["config"]["ui"]
     assert doc.raw["apps"]["sonarr"]["config"]["ui"]["theme"] == "dark"

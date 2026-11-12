@@ -208,7 +208,8 @@ class Puller:
             if "defaults" in self.document.raw:
                 self.document.raw["defaults"] = defaults
             else:
-                self.document.raw.insert(0, "defaults", defaults)
+                position = 1 if "version" in self.document.raw else 0
+                self.document.raw.insert(position, "defaults", defaults)
         apps = self.document.apps
         # Only infer for config singletons and only fields that every app
         # using that resource has with the same value.
