@@ -61,7 +61,7 @@ apps:
             port: 8080
             username: admin
             password: ${QBITTORRENT_PASSWORD}
-            category: serie
+            tvCategory: serie
       notification:
         - name: ntfy
           implementation: Ntfy
@@ -102,7 +102,7 @@ apps:
             port: 8080
             username: admin
             password: ${QBITTORRENT_PASSWORD}
-            category: film
+            movieCategory: film
 
   lidarr:
     connection:

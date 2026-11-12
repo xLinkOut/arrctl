@@ -125,7 +125,7 @@ apps:
 
 ### `defaults`
 
-`defaults` is deep-merged into every app that supports the resource. App values win. For example, `defaults.ui.firstDayOfWeek: 1` applies to Sonarr, Radarr, Lidarr, Whisparr and Prowlarr, but not to Bazarr (Bazarr has no week-start setting).
+`defaults` is deep-merged into every Servarr app that supports the resource. App values win. For example, `defaults.ui.firstDayOfWeek: 1` applies to Sonarr, Radarr, Lidarr, Whisparr and Prowlarr, but not to Bazarr (Bazarr has no week-start setting and uses a different settings model).
 
 Lists are replaced, not merged.
 
@@ -200,7 +200,7 @@ resources:
         port: 8080
         username: admin
         password: ${QBITTORRENT_PASSWORD}
-        category: film
+        movieCategory: film
 ```
 
 `arrctl` merges those values into the app's field schema. Existing resources keep their field metadata; new resources use `implementation`/`configContract` to find the right schema.
@@ -296,7 +296,7 @@ A one-shot service is enough:
 ```yaml
 services:
   arrctl:
-    image: ghcr.io/xlinkout/arrctl:0.1.2
+    image: ghcr.io/xlinkout/arrctl:0.1.3
     profiles: ["setup"]
     networks: [media]
     depends_on:

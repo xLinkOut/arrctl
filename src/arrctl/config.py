@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -124,7 +125,10 @@ class Document:
             raise ConfigError(f"apps.{app}.connection.url is required")
         api_key = resolved.get("api_key")
         if not api_key and resolved.get("api_key_file"):
-            api_key = read_api_key_file(resolved["api_key_file"])
+            key_file = Path(os.path.expanduser(str(resolved["api_key_file"])))
+            if not key_file.is_absolute():
+                key_file = (base_dir or Path.cwd()) / key_file
+            api_key = read_api_key_file(key_file)
         if not api_key:
             raise ConfigError(
                 f"apps.{app}.connection.api_key or api_key_file is required"
