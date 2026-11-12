@@ -275,7 +275,6 @@ The first form writes a template with all connections. The second prompts for ea
 ```bash
 arrctl validate -c arr.yaml
 arrctl doctor -c arr.yaml
-arrctl doctor -c arr.yaml --strict
 ```
 
 `validate` is offline. `doctor` checks connectivity and compares the bundled schema with the live API, which is useful after an app upgrade.
@@ -296,7 +295,7 @@ A one-shot service is enough:
 ```yaml
 services:
   arrctl:
-    image: ghcr.io/xlinkout/arrctl:0.1.3
+    image: ghcr.io/xlinkout/arrctl:0.1.4
     profiles: ["setup"]
     networks: [media]
     depends_on:

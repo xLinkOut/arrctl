@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Keep `version` first when `pull --infer-defaults` creates the defaults block.
+- Make `doctor` exit non-zero when it finds problems.
+- Emit clean JSON from `plan --json`.
+
 ## 0.1.3
 
 - Resolve `api_key_file` paths relative to the YAML file.

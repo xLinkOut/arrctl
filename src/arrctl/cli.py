@@ -85,7 +85,7 @@ def _print_changes(changes: list[Change], *, as_json: bool = False) -> None:
                     "requires_restart": change.requires_restart,
                 }
             )
-        console.print_json(json.dumps(payload))
+        typer.echo(json.dumps(payload))
         return
     if not changes:
         console.print("[green]No changes.[/green]")
@@ -322,7 +322,6 @@ def _app_selected(only: str | None, app_name: str) -> bool:
 def doctor(
     config: Path = typer.Option(..., "--config", "-c", help="Path to arr.yaml."),
     only: str | None = typer.Option(None, "--only"),
-    strict: bool = typer.Option(False, "--strict", help="Exit 1 on any warning."),
 ) -> None:
     """Check connectivity and compare the bundled schema with the live apps."""
     try:
@@ -337,7 +336,7 @@ def doctor(
         console.print(f"[green]ok[/green] {message}")
     for problem in problems:
         console.print(f"[yellow]warn[/yellow] {problem}")
-    if problems and strict:
+    if problems:
         raise typer.Exit(1)
 
 
