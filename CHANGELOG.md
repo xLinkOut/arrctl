@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8
+
+- Treat the API's `********` masked secret values as unchanged, avoiding
+  permanent drift for notification tokens and passwords.
+
 ## 0.1.7
 
 - Strip read-only `supportsOn*` flags from pulled notifications and creates.

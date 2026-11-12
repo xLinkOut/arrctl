@@ -159,6 +159,8 @@ class Engine:
                     raise ConfigError(message)
             old = current.get(key)
             new = coerce_like(value, old)
+            if old == "********" and is_secret(app, resource, key):
+                continue
             if old != new:
                 changes.append(
                     Change(
@@ -288,6 +290,8 @@ class Engine:
                 continue
             old = current.get(key)
             new = coerce_like(value, old)
+            if old == "********" and self._field_is_secret(key):
+                continue
             if definition.prepare == "quality_definition" and key == "quality":
                 old_name = old.get("name") if isinstance(old, dict) else None
                 new_name = new.get("name") if isinstance(new, dict) else None
@@ -311,6 +315,8 @@ class Engine:
             for key, value in desired_fields.items():
                 old = current_fields.get(key)
                 new = coerce_like(value, old)
+                if old == "********" and self._field_is_secret(key):
+                    continue
                 if old != new:
                     changes.append(
                         Change(
