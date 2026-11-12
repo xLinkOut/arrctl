@@ -159,13 +159,21 @@ def flatten_dict(data: Mapping[str, Any], prefix: str = "") -> dict[str, Any]:
 
 
 def redact(value: Any, key: str = "") -> Any:
-    """Redact values whose key looks like a secret."""
+    """Redact values whose key looks like a secret or a credential URL."""
     if isinstance(value, Mapping):
         return {k: redact(v, str(k)) for k, v in value.items()}
     if isinstance(value, list):
         return [redact(v, key) for v in value]
     if key and SECRET_RE.search(key):
         return "********"
+    if isinstance(value, str) and "url" in key.lower() and "://" in value:
+        authority = value.split("://", 1)[1].split("/", 1)[0]
+        lowered = value.lower()
+        if "@" in authority or any(
+            marker in lowered
+            for marker in ("token=", "apikey=", "api_key=", "password=", "secret=")
+        ):
+            return "********"
     return value
 
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+
+- Resolve `${ENV}` placeholders inside config values and resource `fields`.
+- Redact secrets and credential-bearing URLs in `plan` output, including resource creates.
+- Keep `arrctl plan --json` machine-readable.
+
 ## 0.1.5
 
 - Treat encryption keys as secrets during pull/plan.

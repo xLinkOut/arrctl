@@ -100,7 +100,10 @@ class Document:
             # Bazarr settings are top-level sections (general, auth, ...), not
             # Servarr-style /config singletons. The Servarr defaults do not
             # apply to it.
-            return deep_merge({}, explicit)
+            return resolve_value(
+                deep_merge({}, explicit),
+                base_dir=self.path.parent if self.path else None,
+            )
         supported = set(config_resources(app))
         for resource in explicit:
             if resource not in supported:
@@ -110,7 +113,14 @@ class Document:
         merged = deep_merge(self.defaults, explicit)
         # Defaults may contain resources an app does not have (for example
         # Prowlarr has no mediamanagement). Only keep what the app supports.
-        return {resource: values for resource, values in merged.items() if resource in supported}
+        filtered = {
+            resource: values
+            for resource, values in merged.items()
+            if resource in supported
+        }
+        return resolve_value(
+            filtered, base_dir=self.path.parent if self.path else None
+        )
 
     def connection(self, app: str, *, base_dir: Path | None = None) -> Connection:
         app_doc = self.app_doc(app)

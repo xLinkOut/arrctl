@@ -28,6 +28,7 @@ from .util import (
     format_value,
     identity_label,
     identity_value,
+    resolve_value,
 )
 
 
@@ -225,6 +226,10 @@ class Engine:
             for desired in items:
                 if not isinstance(desired, dict):
                     raise ConfigError(f"apps.{app}.resources.{name} entries must be mappings")
+                desired = resolve_value(
+                    desired,
+                    base_dir=self.document.path.parent if self.document.path else None,
+                )
                 desired = resolve_refs_in(
                     client, desired, self._ref_cache, strict=apply
                 )

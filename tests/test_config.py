@@ -63,6 +63,26 @@ apps:
     assert doc.connection("sonarr").url == "http://sonarr"
 
 
+def test_config_values_resolve_env(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("ARR_THEME", "dark")
+    path = tmp_path / "arr.yaml"
+    path.write_text(
+        """
+version: 1
+apps:
+  sonarr:
+    connection:
+      url: http://sonarr
+      api_key: test
+    config:
+      ui:
+        theme: ${ARR_THEME}
+"""
+    )
+    doc = Document.load(path)
+    assert doc.merged_config("sonarr")["ui"]["theme"] == "dark"
+
+
 def test_document_api_key_file(tmp_path: Path) -> None:
     config_xml = tmp_path / "config.xml"
     config_xml.write_text("<Config><ApiKey>abc123</ApiKey></Config>")

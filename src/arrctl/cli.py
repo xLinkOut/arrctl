@@ -19,7 +19,7 @@ from .engine import Change, Engine
 from .errors import ArrctlError
 from .puller import Puller
 from .schema import app_schema, load_schema, validate_document
-from .util import format_value
+from .util import format_value, redact
 
 app = typer.Typer(
     add_completion=False,
@@ -71,6 +71,9 @@ def _print_changes(changes: list[Change], *, as_json: bool = False) -> None:
     if as_json:
         payload = []
         for change in changes:
+            new_value = change.new
+            if change.scope == "resources" and change.action == "create":
+                new_value = redact(new_value)
             payload.append(
                 {
                     "app": change.app,
@@ -80,7 +83,7 @@ def _print_changes(changes: list[Change], *, as_json: bool = False) -> None:
                     "action": change.action,
                     "field": change.field,
                     "old": None if change.secret else change.old,
-                    "new": None if change.secret else change.new,
+                    "new": None if change.secret else new_value,
                     "secret": change.secret,
                     "requires_restart": change.requires_restart,
                 }
@@ -102,7 +105,10 @@ def _print_changes(changes: list[Change], *, as_json: bool = False) -> None:
         if change.identity:
             target += f" [{change.identity}]"
         old = "********" if change.secret else format_value(change.old)
-        new = "********" if change.secret else format_value(change.new)
+        new_value = change.new
+        if change.scope == "resources" and change.action == "create":
+            new_value = redact(new_value)
+        new = "********" if change.secret else format_value(new_value)
         table.add_row(
             change.app,
             target,

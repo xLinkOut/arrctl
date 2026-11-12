@@ -84,7 +84,10 @@ apps:
 
 
 @respx.mock
-def test_apply_creates_collection_item_with_schema_fields(tmp_path: Path) -> None:
+def test_apply_creates_collection_item_with_schema_fields(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv("TOPIC", "alerts")
     doc = _doc(
         tmp_path,
         """
@@ -101,7 +104,7 @@ apps:
           configContract: NtfySettings
           onGrab: false
           fields:
-            topic: alerts
+            topic: ${TOPIC}
 """,
     )
     respx.get("http://sonarr/api/v3/notification").mock(
