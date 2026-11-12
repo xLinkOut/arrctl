@@ -118,14 +118,19 @@ def validate_document(doc: dict[str, Any], *, allow_unknown: bool = False) -> li
             if not isinstance(values, dict):
                 raise ConfigError(f"apps.{app}.config.{resource} must be a mapping")
             if app == "bazarr":
-                for key in flatten_dict(values):
+                for key, value in flatten_dict(values).items():
                     full_key = f"{resource}.{key}"
-                    if not _bazarr_allowed(full_key):
-                        msg = f"{app}.config.{key}: unknown setting"
-                        if allow_unknown:
-                            warnings.append(msg)
-                        else:
-                            raise ConfigError(msg)
+                    if _bazarr_allowed(full_key):
+                        continue
+                    # Empty lists are normal Bazarr settings (the live API
+                    # exposes no leaf value for them).
+                    if isinstance(value, list):
+                        continue
+                    msg = f"{app}.config.{full_key}: unknown setting"
+                    if allow_unknown:
+                        warnings.append(msg)
+                    else:
+                        raise ConfigError(msg)
                 continue
             try:
                 fields = config_fields(app, resource)
