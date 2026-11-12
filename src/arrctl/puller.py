@@ -12,6 +12,7 @@ from .config import Document, OnlyFilter
 from .refs import resolve_refs_out
 from .resources import PULL_EXCLUDE
 from .schema import app_schema, config_fields, is_secret
+from .util import SECRET_RE
 
 
 class Puller:
@@ -146,6 +147,8 @@ class Puller:
             if key == "fields" and isinstance(value, list):
                 cleaned["fields"] = self._clean_fields(value)
                 continue
+            if not self.include_secrets and self._url_has_secret(value):
+                continue
             cleaned[key] = copy.deepcopy(value)
 
         if name == "rootfolder":
@@ -174,15 +177,27 @@ class Puller:
                 continue
             if self._field_is_secret(str(name)) and not self.include_secrets:
                 continue
-            result[str(name)] = copy.deepcopy(entry.get("value"))
+            value = entry.get("value")
+            if not self.include_secrets and self._url_has_secret(value):
+                continue
+            result[str(name)] = copy.deepcopy(value)
         return result
 
     @staticmethod
     def _field_is_secret(name: str) -> bool:
-        lowered = name.lower()
+        return bool(SECRET_RE.search(name.rsplit(".", 1)[-1]))
+
+    @staticmethod
+    def _url_has_secret(value: Any) -> bool:
+        if not isinstance(value, str) or "://" not in value:
+            return False
+        authority = value.split("://", 1)[1].split("/", 1)[0]
+        if "@" in authority:
+            return True
+        lowered = value.lower()
         return any(
-            part in lowered
-            for part in ("password", "apikey", "api_key", "token", "secret", "passkey")
+            marker in lowered
+            for marker in ("token=", "apikey=", "api_key=", "password=", "secret=")
         )
 
     # --------------------------------------------------------------- helpers
@@ -191,11 +206,18 @@ class Puller:
         for section, values in live.items():
             if not isinstance(values, dict):
                 continue
+            if section == "notifications" and not self.include_secrets:
+                self.warnings.append(
+                    "bazarr.notifications: skipped because provider URLs may contain secrets"
+                )
+                continue
             section_clean: dict[str, Any] = {}
             for key, value in values.items():
                 full = f"{section}.{key}"
                 secret = self._field_is_secret(key) or self._field_is_secret(full)
                 if secret and not self.include_secrets:
+                    continue
+                if not self.include_secrets and self._url_has_secret(value):
                     continue
                 section_clean[key] = copy.deepcopy(value)
             cleaned[section] = section_clean

@@ -1,3 +1,3 @@
 """arrctl: declarative configuration for the *arr stack."""
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"

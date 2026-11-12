@@ -297,7 +297,7 @@ A one-shot service is enough:
 ```yaml
 services:
   arrctl:
-    image: ghcr.io/xlinkout/arrctl:0.1.4
+    image: ghcr.io/xlinkout/arrctl:0.1.5
     profiles: ["setup"]
     networks: [media]
     depends_on:

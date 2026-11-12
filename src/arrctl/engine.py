@@ -22,6 +22,7 @@ from .resources import (
 )
 from .schema import config_fields, is_secret
 from .util import (
+    SECRET_RE,
     coerce_like,
     flatten_dict,
     format_value,
@@ -467,11 +468,7 @@ class Engine:
 
     @staticmethod
     def _field_is_secret(key: str) -> bool:
-        lowered = key.rsplit(".", 1)[-1].lower()
-        return any(
-            part in lowered
-            for part in ("password", "apikey", "api_key", "token", "secret", "passkey")
-        )
+        return bool(SECRET_RE.search(key.rsplit(".", 1)[-1]))
 
     # --------------------------------------------------------------- bazarr
     def _scan_bazarr(self, result: ScanResult, *, apply: bool, wait: float) -> None:

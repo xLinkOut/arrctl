@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5
+
+- Treat encryption keys as secrets during pull/plan.
+- Skip Bazarr notifications by default because provider URLs may embed tokens.
+- Redact URLs containing credentials or token query parameters.
+
 ## 0.1.4
 
 - Keep `version` first when `pull --infer-defaults` creates the defaults block.

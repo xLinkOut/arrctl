@@ -107,15 +107,25 @@ apps:
             json={
                 "general": {"theme": "dark", "page_size": 25},
                 "auth": {"apikey": "secret", "type": "form"},
+                "plex": {"encryption_key": "very-secret"},
+                "notifications": {
+                    "providers": [
+                        {"name": "ntfy", "enabled": True, "url": "ntfy://token@ntfy/topic"}
+                    ]
+                },
             },
         )
     )
     doc = Document.load(path)
-    Puller(doc, only="bazarr.general").pull()
+    warnings = Puller(doc).pull()
     doc.save(path)
     text = path.read_text()
     assert "theme: dark" in text
     assert "secret" not in text
+    assert "very-secret" not in text
+    assert "ntfy://token@" not in text
+    assert "notifications:" not in text
+    assert any("bazarr.notifications" in warning for warning in warnings)
 
 
 def test_infer_defaults(tmp_path: Path) -> None:

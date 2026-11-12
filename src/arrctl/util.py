@@ -15,7 +15,8 @@ ENV_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}")
 FILE_RE = re.compile(r"\$\{file:([^}]+)\}")
 
 SECRET_RE = re.compile(
-    r"(?:api[_-]?key|password|passwd|token|secret|passkey|private[_-]?key)$",
+    r"(?:api[_-]?key|encryption[_-]?key|signing[_-]?key|password|passwd|token|"
+    r"secret|passkey|private[_-]?key)$",
     re.IGNORECASE,
 )
 

@@ -19,8 +19,8 @@ workflow already contains an optional PyPI job.
 4. Push a new version tag:
 
    ```bash
-   git tag -a v0.1.4 -m "arrctl 0.1.2"
-   git push origin v0.1.4
+   git tag -a v0.1.5 -m "arrctl 0.1.2"
+   git push origin v0.1.5
    ```
 
 The `pypi` job runs `uv publish`. If the secret is missing it prints a message
