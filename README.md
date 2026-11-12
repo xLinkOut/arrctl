@@ -39,11 +39,13 @@ With `uv`/`uvx`, directly from GitHub (no clone needed):
 uvx --from git+https://github.com/xLinkOut/arrctl arrctl --help
 ```
 
-Once the package is published to PyPI:
+Once the package is published to PyPI (see [PUBLISHING.md](PUBLISHING.md)):
 
 ```bash
 uvx arrctl --help
 ```
+
+Until then, use the `uvx --from git+...` form above; it does not require a clone.
 
 Or install it as a normal tool:
 
