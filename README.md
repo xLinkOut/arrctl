@@ -1,5 +1,8 @@
 # arrctl
 
+[![CI](https://github.com/xLinkOut/arrctl/actions/workflows/ci.yml/badge.svg)](https://github.com/xLinkOut/arrctl/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/xLinkOut/arrctl)](https://github.com/xLinkOut/arrctl/releases)
+
 Declarative configuration for **Sonarr**, **Radarr**, **Lidarr**, **Whisparr**, **Prowlarr** and **Bazarr**.
 
 `arrctl` keeps a single YAML file as the source of truth, can **apply** it to a running stack, and can **pull** the current live configuration back into the file. It talks directly to the app APIs, uses native field names, and only manages the keys you put in the file.
